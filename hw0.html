@@ -51,7 +51,7 @@ function init()
 	controls = new THREE.OrbitControls (camera, renderer.domElement);
 	
 	// FLOOR
-	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/photo.jpg' );
+	var floorTexture = new THREE.ImageUtils.loadTexture( 'images/photo.JPG' );
 	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
 	floorTexture.repeat.set( 1, 1);
 	var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
