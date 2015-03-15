@@ -13,7 +13,17 @@
 </style>
 </head>
 <body>
+
+  <div id = "info"> 
+     hw1 <br/>
+	 Sounds <br/><br/>
+	 with BGM (<a href="javascript:toggle();">universe</a>)
 <div id="info">demo page</div>
+
+<audio id="universe" autoplay loop style="display:none">
+<source src="audio/universe.mp4" type='audio/mp4'>
+</audio>
+
 <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r70/three.min.js"></script>
 <script src="https://dl.dropboxusercontent.com/u/3587259/Code/Threejs/OrbitControls.js"></script>
 
@@ -24,9 +34,16 @@ var camera, scene, renderer, sun, earth, angle = 0,
 init();
 animate();
 
+function toggle() {
+	isPaused = !isPaused;
+	sign = isPaused ? -1 : 1;
+	console.log (isPaused);
+}
+
 function init() {
     clock = new THREE.Clock();
     scene = new THREE.Scene();
+	soundTrack = document.getElementById ('universe');
 
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.z = 500;
@@ -73,13 +90,18 @@ function onWindowResize() {
 }
 
 function animate() {
+    soundVal += sign*0.01;
+    soundVal = THREE.Math.clamp (soundVal, 0, 1);
+    soundtrack.volume = soundVal;
+
     control.update();
     requestAnimationFrame(animate);
     render();
 }
 
+
 function render() {
-    angle = clock.getElapsedTime()/100;
+    angle = clock.getElapsedTime()/200;
     var dt = clock.getDelta();
 
     earth.position.set(80 * Math.cos(angle), 0, -80 * Math.sin(angle));
