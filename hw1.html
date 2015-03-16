@@ -128,29 +128,22 @@ function animate() {
 
 
 function render() {
-
-    angle = clock.getElapsedTime()/200;
     var dt = clock.getDelta();
 
-    earth.position.set(80 * Math.cos(angle), 0, -80 * Math.sin(angle));
-    earth.rotation.y = angle*360 - dt;
 
 	keyboard.update();
 	if ( keyboard.down("Z"))  
 		toggleTurn();    
-    if(turn)angle = clock.getElapsedTime()/180 * 3.1416 ;
+    if(turn)angle = (clock.getElapsedTime()-dt)/180 * 3.1416 ;
 
     earth.position.set(80 * Math.cos(angle), 0, -80 * Math.sin(angle));
-    earth.rotation.y = angle*10;
+    earth.rotation.y = angle*10-dt;
 
 
 
     angle2 = angle*365/27 ;
     moon.position.set(20 * Math.cos(angle2), 0, -20 * Math.sin(angle2));
-
-    moon.rotation.y = angle2*30;
-    moon.rotation.y -= dt;
-    moon.rotation.y = angle*10;
+    moon.rotation.y = angle*10-dt;
 
 
     renderer.render(scene, camera);
