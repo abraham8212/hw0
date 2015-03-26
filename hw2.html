@@ -1,0 +1,182 @@
+
+<html>
+<head>
+<style>
+#info {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    color: #ff0000
+}
+</style>
+</head>
+<body>
+<div id="info">HW1</div>
+<br/>
+<a href="javascript:spin('open');">OPEN</a>
+<br/>
+<a href="javascript:spin('close');">CLOSE</a>
+
+<audio id="door_open"  style="display:none">
+<source src="audio\door_open.mp3" type='audio/mp3'>
+</audio>
+<audio id="door_close"  style="display:none">
+<source src="audio\door_close.mp3" type='audio/mp3'>
+</audio>
+
+
+
+
+
+
+<script src="js/three.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+
+<script>
+var camera, scene, renderer, light, controls;
+var angle;
+var turn=false;
+var n_turn=false;
+var isPaused = false, soundVal = 1.0, sign = 1.0;
+var door_open,door_close;
+var frame;
+
+init();
+animate();
+
+function spin (which) 
+{
+	if (which == "open") {
+		n_turn = false;
+		turn = true;
+		door_open.play();
+	}	
+	else if (which == "close") {
+		turn = false;
+		n_turn = true;
+		door_close.play();
+	}
+}
+
+function init() {
+
+    door_open = document.getElementById ('door_open');
+    door_close = document.getElementById ('door_close');
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.z = 500;
+    scene.add(camera);
+
+    frame = new THREE.Object3D();
+    scene.add(frame);
+
+    columnGeom = new THREE.BoxGeometry(10, 400, 10);
+    platformGeom = new THREE.BoxGeometry(200, 10, 10);
+    topGeom = new THREE.BoxGeometry(200, 10, 10);
+    doorGeom = new THREE.BoxGeometry(188 , 379, 10);
+    holdGeom = new THREE.TorusGeometry (5,6,10,40);
+    hold2Geom = new THREE.CylinderGeometry (6,6,10,50);
+    side1Geom = new THREE.BoxGeometry(5 , 30, 5);
+    side2Geom = new THREE.BoxGeometry(5 , 30, 5);
+    material = new THREE.MeshLambertMaterial();
+
+    door = new THREE.Object3D();
+
+    var WoodenTexture = new THREE.ImageUtils.loadTexture('images/wooden.jpg');
+
+    var bumptex = THREE.ImageUtils.loadTexture('images/wooden_bump2.jpg');
+
+
+    var mesh = new THREE.Mesh(columnGeom,  new THREE.MeshBasicMaterial({
+    map: WoodenTexture     ,
+        bumpMap: bumptex,
+        bumpScale: 0.8,}));
+    var mesh2 = mesh.clone();
+    mesh.position.set(5, 200, -5);
+    mesh2.position.set(205, 200, -5);
+    var mesh1 = new THREE.Mesh(platformGeom, new THREE.MeshBasicMaterial({
+    map: WoodenTexture,
+        bumpMap: bumptex,
+        bumpScale: 0.8,     }));
+    mesh1.position.set(105, 5, -5);
+    var mesh3 = new THREE.Mesh(topGeom,  new THREE.MeshBasicMaterial({
+    map: WoodenTexture,
+        bumpMap: bumptex,
+        bumpScale: 0.8,      }));
+    mesh3.position.set(105, 395, -5);
+    var mesh4 = new THREE.Mesh(doorGeom,  new THREE.MeshBasicMaterial({
+    map: WoodenTexture,
+        bumpMap: bumptex,
+        bumpScale: 0.8,      }));
+    mesh4.position.set(-95.5, 200, -5);
+    var mesh5 = new THREE.Mesh(holdGeom,  material );
+    mesh5.position.set(-170, 200, 10);
+    var mesh6 = new THREE.Mesh(hold2Geom,  material );
+    mesh6.position.set(-170, 200, 5);
+    mesh6.rotation.x = 0.5*Math.PI;
+    var mesh7 = new THREE.Mesh(side1Geom,  material );
+    mesh7.position.set(200, 300, 0);
+    var mesh8 = new THREE.Mesh(side2Geom,  material );
+    mesh8.position.set(200, 100, 0);
+    frame.add(mesh);
+    frame.add(mesh1);
+    frame.add(mesh2);
+    frame.add(mesh3);
+    frame.add(mesh7);
+    frame.add(mesh8);
+
+    door.add(mesh4);
+    door.add(mesh5);
+    door.add(mesh6);
+
+    frame.add(door);
+    door.position.set(200, 0,0);
+
+    light = new THREE.PointLight(0xffffff);
+    light.position.set(100, 300, 200);
+    scene.add(light);
+
+    var gridXZ = new THREE.GridHelper(300, 10);
+    gridXZ.setColors(new THREE.Color(0xff0000), new THREE.Color(0xffffff));
+    scene.add(gridXZ);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xcccccc);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    document.body.appendChild(renderer.domElement);
+
+}
+
+function animate() {
+    controls.update();
+    requestAnimationFrame(animate);
+    render();
+}
+
+function render() {
+    frame.rotation.y = 0;
+    renderer.render(scene, camera);
+
+    if(turn)
+	{
+		if(door.rotation.y<=0.5*Math.PI)door.rotation.y+=0.01*Math.PI;
+		if(door.totation.y>=0.5*Math.PI){turn=false;}    
+	}
+    else if(n_turn)
+	{
+		if(door.rotation.y>=0*Math.PI)door.rotation.y-=0.01*Math.PI;
+		if(door.totation.y<=0*Math.PI){n_turn=false;}    
+	}
+
+
+}</script>
+</body>
+
+</html>
