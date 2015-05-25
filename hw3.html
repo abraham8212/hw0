@@ -1,0 +1,191 @@
+
+<html>
+<head>
+<style>
+#info {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    color: #ff0000
+}
+</style>
+</head>
+<body>
+<div id="info">HW3
+</div>
+
+
+
+
+
+<script src="js/three.min.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/KeyboardState.js"></script>
+
+
+<script>
+var camera, scene, renderer, light, controls;
+var angle =0;
+var sign=1;
+var power=5.0;
+var pos = new THREE.Vector3(0,0,0);
+var frame;
+var keyboard = new KeyboardState();
+
+init();
+animate();
+
+function init() {
+    clock = new THREE.Clock();
+
+
+    scene = new THREE.Scene();
+
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
+    camera.position.z = 500;
+    scene.add(camera);
+
+    frame = new THREE.Object3D();
+    scene.add(frame);
+
+
+    tireGeom = new THREE.CylinderGeometry (12,12,10,20);
+    tire_circle1 = new THREE.CircleGeometry (11.95,50);
+    tire_circle2 = new THREE.CircleGeometry (11.95,50);
+    material = new THREE.MeshLambertMaterial();
+
+    tire = new THREE.Object3D();
+
+    var TireTexture = new THREE.ImageUtils.loadTexture('images/tire.jpg');
+    var TireTexture_side = new THREE.ImageUtils.loadTexture('images/tire_side.png');
+
+    var bumptex = THREE.ImageUtils.loadTexture('images/tire_bump.jpg');
+
+
+    var mesh = new THREE.Mesh(tireGeom,  new THREE.MeshBasicMaterial({
+    map: TireTexture     ,
+        bumpMap: bumptex,
+        bumpScale: 0.8,}));
+    mesh.position.set(0, 0.425, -5);
+    mesh.rotation.x = Math.PI / 2;
+
+    var mesh1 = new THREE.Mesh(tire_circle1, new THREE.MeshBasicMaterial({
+    map: TireTexture_side,
+        transparent: true,  
+        side: THREE.DoubleSide}));
+    mesh1.position.set(0,0, -11);
+
+
+    var mesh2 = new THREE.Mesh(tire_circle2, new THREE.MeshBasicMaterial({
+    map: TireTexture_side,
+        transparent: true,
+        side: THREE.DoubleSide}));
+    mesh2.position.set(0,0, 1);
+
+    TireTexture.wrapS = TireTexture.wrapT = THREE.RepeatWrapping; 
+    TireTexture.repeat.set( 1, 1 );
+
+    var mesh3 = new THREE.Mesh(new THREE.CylinderGeometry(11.3, 11.3, 12,30, 1, true), 
+    new THREE.MeshBasicMaterial({
+        map: TireTexture,
+        side: THREE.DoubleSide,
+        bumpMap: bumptex,
+        bumpScale: 0.8
+    }));
+    mesh3.position.set(0,-0.075, -5);
+    mesh3.rotation.x = Math.PI / 2;
+
+
+
+
+
+
+
+    tire.add(mesh1);
+    tire.add(mesh2);
+    tire.add(mesh3);
+
+
+    frame.add(tire);
+
+    tire.position.set(210, 11.3,0);
+
+
+    light = new THREE.PointLight(0xffffff);
+    light.position.set(100, 300, 200);
+    scene.add(light);
+
+    var gridXZ = new THREE.GridHelper(300, 10);
+    gridXZ.setColors(new THREE.Color(0xff0000), new THREE.Color(0xffffff));
+    scene.add(gridXZ);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xcccccc);
+
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+    document.body.appendChild(renderer.domElement);
+
+}
+
+function animate() {
+    controls.update();
+    var dir = new THREE.Vector3(0,0,-1);
+    pos.add(dir);
+
+    if (tire != undefined) 
+    {
+	tire.scale.set(0.2, 0.2, 0.2)
+	tire.position.set (pos.x, pos.y, pos.z);
+	tire.rotation.y = angle + Math.PI / 2;
+     }
+    requestAnimationFrame(animate);
+    update();
+    render();
+
+}
+function myclamp(x,lo,hi)
+{
+	if (x < lo) return lo;
+	if (x > hi) return hi;
+	return x;
+}
+function update()
+{
+    var vel=10;
+    var dt = clock.getDelta();
+    controls.update();
+    keyboard.update(); 
+    var angle = Math.PI ;
+    angle_thrust = angle;
+    if(keyboard.pressed("left"))
+	{
+angle_thrust +=0.3;
+   		tire.rotation.z += vel*dt/10*sign;
+		
+	}
+    if(keyboard.pressed("right"))
+	{
+angle_thrust -=0.3;
+   		tire.rotation.z += vel*dt/10*sign;
+	}
+
+	speed = myclamp (speed, 0, 20);
+
+}
+
+function render() {
+    frame.rotation.y = 0;
+    renderer.render(scene, camera);
+ 
+
+
+
+
+}</script>
+</body>
+
+</html>
